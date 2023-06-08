@@ -1,8 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const userRoutes = require("./routes/user");
-const cineRoutes = require("./routes/cinego");
+const userRoutes = require("./routes/routerUser");
+const cineRoutes = require("./routes/routerMovies");
+const shoopingRoutes = require("./routes/routerShooping");
+const routerSuscription= require("./routes/routerSuscription")
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -14,6 +16,9 @@ app.use(express.json());
 app.use("/", userRoutes);
 
 app.use("/cineGo", cineRoutes);
+app.use("/shooping", shoopingRoutes);
+app.use("/suscription", routerSuscription);
+
 
 // Conección MongoDB
 mongoose
