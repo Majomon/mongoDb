@@ -1,11 +1,22 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const moviesSchema = new mongoose.Schema({
+const movieSchema = new mongoose.Schema({
+  adult: Boolean,
+  backdrop_path: String,
+  genre_ids: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
+  id: Number,
+  original_language: String,
+  original_title: String,
+  overview: String,
+  popularity: Number,
+  poster_path: String,
+  release_date: 'Date', // Corrección aquí
   title: String,
-  genre: String,
-  rating: Number,
-  description: String,
-  // ...otras propiedades
+  video: Boolean,
+  vote_average: Number,
+  vote_count: Number
 });
 
-module.exports = mongoose.model("Movies", moviesSchema);
+const Movie = mongoose.model('Movie', movieSchema);
+
+module.exports = Movie;

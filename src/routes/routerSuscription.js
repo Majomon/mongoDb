@@ -1,5 +1,4 @@
 const express = require("express");
-const suscriptionSchema = require("../models/shooping");
 
 const suscription = express.Router();
 
