@@ -16,6 +16,19 @@ const getMovieHandler = async (req, res) => {
     // Insertar los documentos en la base de datos
     await Movie.insertMany(movies);
 
+    // Obtener los géneros relacionados con las películas
+    const genreIds = movies.flatMap((movie) => movie.genre_ids);
+    const genres = await Genre.find({ _id: { $in: genreIds } });
+
+    // Actualizar las referencias de géneros en las películas
+    for (const movie of movies) {
+      const genreObjects = genres.filter((genre) =>
+        movie.genre_ids.includes(genre._id)
+      );
+      const genreIds = genreObjects.map((genre) => genre._id);
+      await Movie.findByIdAndUpdate(movie._id, { genre_ids: genreIds });
+    }
+
     res.status(200).json(movies);
   } catch (error) {
     res.status(400).json({ error: error.message });
