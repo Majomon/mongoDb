@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const Movie = require("../models/movies");
 const Genre = require("../models/genre");
 const moviesData = require("../controllers/getMovieApi");
@@ -6,28 +5,24 @@ const moviesData = require("../controllers/getMovieApi");
 const getMovieHandler = async (req, res) => {
   try {
     const movieApiData = await moviesData(); // Obtener los datos de películas de la API
+    const movies = movieApiData.results; // Acceder a la propiedad "results" que contiene los datos de las películas
 
-    // Transformar los genre_ids en tipo ObjectId
-    const movies = movieApiData.results.map((movie) => ({
-      ...movie,
-      genre_ids: movie.genre_ids.map((id) => new mongoose.Types.ObjectId(id)),
-    }));
+    // Obtener todos los géneros del modelo Genre
+    const genres = await Genre.find();
 
-    // Insertar los documentos en la base de datos
-    await Movie.insertMany(movies);
+    // Crear un mapa de géneros para facilitar la búsqueda por ID
+    const genreMap = new Map();
+    genres.forEach((genre) => {
+      genreMap.set(genre.id, genre.name);
+    });
 
-    // Obtener los géneros relacionados con las películas
-    const genreIds = movies.flatMap((movie) => movie.genre_ids);
-    const genres = await Genre.find({ _id: { $in: genreIds } });
-
-    // Actualizar las referencias de géneros en las películas
-    for (const movie of movies) {
-      const genreObjects = genres.filter((genre) =>
-        movie.genre_ids.includes(genre._id)
-      );
-      const genreIds = genreObjects.map((genre) => genre._id);
-      await Movie.findByIdAndUpdate(movie._id, { genre_ids: genreIds });
-    }
+    // Reemplazar los IDs de género por los nombres correspondientes en cada película
+    movies.forEach((movie) => {
+      movie.genre_ids = movie.genre_ids.map((genreId) => {
+        const genreName = genreMap.get(genreId);
+        return genreName ? genreName : genreId;
+      });
+    });
 
     res.status(200).json(movies);
   } catch (error) {

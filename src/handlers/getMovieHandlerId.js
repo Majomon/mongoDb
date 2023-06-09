@@ -1,8 +1,6 @@
 const Genre = require("../models/genre");
 const Movie = require("../models/movies");
 
-const getGenreApi = require("../controllers/getGenreApi");
-
 const getGenreHandler = async (req, res) => {
   const { id } = req.params;
   try {
